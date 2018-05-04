@@ -6,6 +6,7 @@ import           Data.Aeson                 (encode)
 import qualified Data.ByteString.Lazy.Char8 as C
 import           Data.List
 import           Data.Monoid
+import           Debug.Trace
 import           FastDipole
 import           System.Environment
 import           System.FilePath.Posix      (takeBaseName)
@@ -28,7 +29,7 @@ main = do
       case params of
         Nothing       -> error "No parse."
         Just (_, dat) -> do
-          putStrLn "Generating header file. It may take tens of minutes..."
+          putStrLn "Generating .cxx file. It may take tens of minutes..."
           let result = (fastDipoleSegs $ dipoleParams dat, length (dipoleParams dat))
           writeFile tmpfile $ show result
           return result
@@ -97,7 +98,7 @@ renderXDef prefix ss = mconcat
 renderYDef :: String -> FastDipoleY -> String
 renderYDef prefix ss = mconcat
   [ renderSlicesDef prefix $ _fSlices ss
-  , renderArrayDef "ushort" (prefix <> "_ids") . map (show . head) $ _fSegments ss
+  , renderArrayDef "ushort" (prefix <> "_ids") . map (show . head') $ _fSegments ss
   ]
 
 -- | debug
@@ -109,3 +110,8 @@ load = do
   -- s ^.. fSegments . traverse . fSegments . traverse . fSegments . traverse . to length
   --let r = quickSearch s (-1000)
   return (dip, s)
+
+head' :: [Int] -> Int
+head' []  = 65535
+head' [x] = x
+head' xs  = trace (show xs) (head xs)

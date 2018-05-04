@@ -37,45 +37,45 @@ makeLenses ''SegmentSearch
 makeLenses ''LineDivision
 makeLenses ''SegmentEnd
 
--- | A 'SegmentEnd' without actual end of the segment.
+-- | A 'SegmentEnd' without actual end of a segment.
 continue :: Int -> SegmentEnd
 continue = flip SegmentEnd (1/0) -- never match
 
--- | Filter given list of 'AliCheb3D' by condition f, then remove dup and sort by (axis)-th axis in acending order.
+-- | Filter given list of 'AliCheb3D' by condition f, then remove duplicates and sort by (axis)-th axis in acending order.
 -- The f is a function that takes ([minX,minY,minZ], [maxX,maxY,maxZ]) and returns True or False.
-segmentBorders :: Int -> (([Double], [Double]) -> Bool) -> [(String, AliCheb3D)] -> [Double]
-segmentBorders axis f d =
+patchBorders :: Int -> (([Double], [Double]) -> Bool) -> [(String, AliCheb3D)] -> [Double]
+patchBorders axis f d =
   d ^.. traverse . _2 . region . filtered f . both . ix axis & nub & sort
 
--- | Generate arithmetic sequence (slices) from 'LineDivision' spec.
+-- | Generate an arithmetic sequence (slices) from 'LineDivision' spec.
 makeGrid :: LineDivision -> [Double]
 makeGrid (LineDivision n width offset) = [ (width / n') * k + offset | k <- [0..n'] ]
   where n' = realToFrac n
 
--- | Make a spec of arithmetic sequence from segment border( position)s and number of divisions.
+-- | Make a spec of arithmetic sequence from the border positions of patches and the number of divisions.
 divBy :: [Double] -> Int -> LineDivision
 divBy zs n = LineDivision n (last zs - head zs) (head zs)
 
--- | Enumerate all segment borders (as 'SegmentEnd') for each slice.
+-- | Enumerate all patch borders (as 'SegmentEnd') within every slice.
 bordersInSlices :: [Double] -> [Double] -> [[SegmentEnd]]
 bordersInSlices zs slices =
   [ zip [0..] (tail zs) ^.. traversed . filtered (\(_, z) -> l <= z && z < r) . to (uncurry SegmentEnd)
   | (l, r) <- zip slices (tail slices) ]
 
--- | Try to divide 'zs' (list of z values) into n slices.
+-- | Try to divide 'zs' (list of border z values) into n slices.
 trySliceBy :: [Double] -> Int -> [[SegmentEnd]]
 trySliceBy zs n = bordersInSlices zs (makeGrid (zs `divBy` n))
 
--- | Maximum number of segment borders in _one slice_, when number of division is 'n'.
+-- | Maximum number of patch borders in _one slice_, when the number of division is 'n'.
 multiplicity :: [Double] -> Int -> Int
 multiplicity zs n = maximum $ map length $ zs `trySliceBy` n
 
--- | Calculate minimum number of division 'n' so that "multiplicity zs n == 1" holds.
--- One slice must not have more than two segment borders in it.
+-- | Calculate the minimum number of division 'n' so that "multiplicity zs n == 1" holds.
+-- One slice must not have more than two patch borders in it.
 minDivisionN :: [Double] -> Int
 minDivisionN zs = length (takeWhile (>1) $ map (multiplicity zs) [1..]) + 1
 
--- | Given the number of division 'n' (large enouth), get spec for such slices (as 'LineDivision'), and list of one segment border per slice.
+-- | Given the number of division 'n' (large enouth), get spec for such slices (as 'LineDivision'), and list of one patch border per slice.
 sliceBy :: [Double] -> Int -> (LineDivision, [SegmentEnd])
 sliceBy zs n = (zs `divBy` n, go 0 $ trySliceBy zs n)
   where
@@ -87,40 +87,49 @@ sliceBy zs n = (zs `divBy` n, go 0 $ trySliceBy zs n)
 searchGoodSlice :: [Double] -> (LineDivision, [SegmentEnd])
 searchGoodSlice zs = zs `sliceBy` minDivisionN zs
 
--- | 'zipWith' that gives adjacent two items of zs to f. e.g.
+-- | 'zipWith' that gives adjacent two items of zs to 'f'.
 --
 -- > zipAdjacent [1,2,3,4] f == [f 1 2, f 2 3, f 3 4]
+--
 zipAdjacent :: [a] -> (a -> a -> b) -> [b]
 zipAdjacent zs f = zipWith f zs (tail zs)
 
--- | Enumerate segment borders for X that contain z in (minZ,maxZ)
-xSegmentBorders :: Double -> Double -> [(String, AliCheb3D)] -> [Double]
-xSegmentBorders minZ maxZ = segmentBorders 0{- X axis -} pred
-  where pred ([_,_,z],[_,_,z']) = minZ < z' && z < maxZ
+zipAdjacent' :: [a] -> ((a, a) -> b) -> [b]
+zipAdjacent' zs f' = zipAdjacent zs (curry f')
 
--- | Both Z in (minZ,maxZ) AND X in (minX,maxX) is satisfied
-ySegmentBorders :: Double -> Double -> Double -> Double -> [(String, AliCheb3D)] -> [Double]
-ySegmentBorders minZ maxZ minX maxX = segmentBorders 1{- Y axis-} pred
-  where pred ([x,_,z],[x',_,z']) = minZ < z' && z < maxZ
-                                && minX < x' && x < maxX
+isHalfCoveredBy :: (Double, Double) -> (Double, Double) -> Bool
+isHalfCoveredBy segment@(smin, smax) patch@(pmin, pmax) =
+  let smid = (smin + smax) / 2 in pmin <= smid && smid <= pmax
+
+-- | Enumerate X-axis border positions of the patches which are crossing over given Z segment (minZ, maxZ).
+yPatchBorders :: (Double, Double) -> [(String, AliCheb3D)] -> [Double]
+yPatchBorders zseg = patchBorders 1{- Y axis -} $
+  \([_,_,z],[_,_,z']) -> zseg `isHalfCoveredBy` (z, z')
+
+-- | All Y-axis border positions, where both Z in (minZ, maxZ) AND X in (minX, maxX) is satisfied.
+xPatchBorders :: (Double, Double) -> (Double, Double) -> [(String, AliCheb3D)] -> [Double]
+xPatchBorders zseg yseg = patchBorders 0{- X axis-} $
+  \([x,y,z],[x',y',z']) -> zseg `isHalfCoveredBy` (z, z')
+                       && yseg `isHalfCoveredBy` (y, y')
 
 -- | Turn AliMagF Dipole into FastDipole!
 fastDipoleSegs :: [(String, AliCheb3D)] -> FastDipole
 fastDipoleSegs dip =
-  let zs = segmentBorders 2{- Z axis -} (const True) dip
+  let zs = patchBorders 2{- Z axis -} (const True) dip
       (dv, slices) = searchGoodSlice zs
-  in SegmentSearch zs dv slices $ zipAdjacent zs $ \minZ maxZ ->
-      let xs = xSegmentBorders minZ maxZ dip
-          (dv', slices') = searchGoodSlice xs
-      in SegmentSearch xs dv' slices' $ zipAdjacent xs $ \minX maxX ->
-          let ys = ySegmentBorders minZ maxZ minX maxX dip
-              (dv'', slices'') = searchGoodSlice ys
-          in SegmentSearch ys dv'' slices'' $ zipAdjacent ys $ \minY maxY ->
+  in SegmentSearch zs dv slices $ zipAdjacent' zs $ \zseg ->
+      let ys = yPatchBorders zseg dip
+          (dv', slices') = searchGoodSlice ys
+      in SegmentSearch ys dv' slices' $ zipAdjacent' ys $ \yseg ->
+          let xs = xPatchBorders zseg yseg dip
+              (dv'', slices'') = searchGoodSlice xs
+          in SegmentSearch xs dv'' slices'' $ zipAdjacent' xs $ \xseg ->
               map fst $ filter (\(i,([x,y,z],[x',y',z'])) ->
-                  minZ < z' && z < maxZ
-                && minX < x' && x < maxX
-                && minY < y' && y < maxY
+                   zseg `isInsideOf` (z, z')
+                && yseg `isInsideOf` (y, y')
+                && xseg `isInsideOf` (x, x')
               ) $ zip [0..] $ dip ^.. traversed . _2 . region
+  where isInsideOf (smin, smax) (zmin, zmax) = let smid = (smin + smax) / 2 in zmin < smid && smid < zmax
 
 -- | Fast search of the unique segment which includes given 1D point
 quickSearch :: SegmentSearch a -> Double -> Int
@@ -133,8 +142,8 @@ dipoleSearch :: FastDipole -> (Double, Double, Double) -> [Int]
 dipoleSearch zDip (x,y,z) =
   let zix = quickSearch zDip z
       xDip = _fSegments zDip !! zix
-      xix = quickSearch xDip x
+      xix = quickSearch xDip y
       yDip = _fSegments xDip !! xix
-      yix = quickSearch yDip y
+      yix = quickSearch yDip x
       paramIx = _fSegments yDip !! yix
   in paramIx
