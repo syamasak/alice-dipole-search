@@ -2,3 +2,12 @@
 DipoleParam.cabal
 *~
 .DS_Store
+*.so
+*.asm
+*.d
+*.pcm
+*.pdf
+*.json
+*.txt
+*k.cxx
+*_tmp.dat

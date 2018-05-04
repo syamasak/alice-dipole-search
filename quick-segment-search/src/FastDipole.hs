@@ -59,7 +59,7 @@ divBy zs n = LineDivision n (last zs - head zs) (head zs)
 -- | Enumerate all segment borders (as 'SegmentEnd') for each slice.
 bordersInSlices :: [Double] -> [Double] -> [[SegmentEnd]]
 bordersInSlices zs slices =
-  [ zip [0..] (tail zs) ^.. traversed . filtered (\(_, z) -> l < z && z <= r) . to (uncurry SegmentEnd)
+  [ zip [0..] (tail zs) ^.. traversed . filtered (\(_, z) -> l <= z && z < r) . to (uncurry SegmentEnd)
   | (l, r) <- zip slices (tail slices) ]
 
 -- | Try to divide 'zs' (list of z values) into n slices.
