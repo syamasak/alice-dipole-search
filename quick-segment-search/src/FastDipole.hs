@@ -102,15 +102,15 @@ isHalfCoveredBy segment@(smin, smax) patch@(pmin, pmax) =
   let smid = (smin + smax) / 2 in pmin <= smid && smid <= pmax
 
 -- | Enumerate X-axis border positions of the patches which are crossing over given Z segment (minZ, maxZ).
-yPatchBorders :: (Double, Double) -> [(String, AliCheb3D)] -> [Double]
-yPatchBorders zseg = patchBorders 1{- Y axis -} $
+xPatchBorders :: (Double, Double) -> [(String, AliCheb3D)] -> [Double]
+xPatchBorders zseg = patchBorders 0{- X axis -} $
   \([_,_,z],[_,_,z']) -> zseg `isHalfCoveredBy` (z, z')
 
 -- | All Y-axis border positions, where both Z in (minZ, maxZ) AND X in (minX, maxX) is satisfied.
-xPatchBorders :: (Double, Double) -> (Double, Double) -> [(String, AliCheb3D)] -> [Double]
-xPatchBorders zseg yseg = patchBorders 0{- X axis-} $
+yPatchBorders :: (Double, Double) -> (Double, Double) -> [(String, AliCheb3D)] -> [Double]
+yPatchBorders zseg xseg = patchBorders 1{- Y axis-} $
   \([x,y,z],[x',y',z']) -> zseg `isHalfCoveredBy` (z, z')
-                       && yseg `isHalfCoveredBy` (y, y')
+                       && xseg `isHalfCoveredBy` (x, x')
 
 -- | Turn AliMagF Dipole into FastDipole!
 fastDipoleSegs :: [(String, AliCheb3D)] -> FastDipole
@@ -118,13 +118,13 @@ fastDipoleSegs dip =
   let zs = patchBorders 2{- Z axis -} (const True) dip
       (dv, slices) = searchGoodSlice zs
   in SegmentSearch zs dv slices $ zipAdjacent' zs $ \zseg ->
-      let ys = yPatchBorders zseg dip
-          (dv', slices') = searchGoodSlice ys
-      in SegmentSearch ys dv' slices' $ zipAdjacent' ys $ \yseg ->
-          let xs = xPatchBorders zseg yseg dip
-              (dv'', slices'') = searchGoodSlice xs
-          in SegmentSearch xs dv'' slices'' $ zipAdjacent' xs $ \xseg ->
-              map fst $ filter (\(i,([x,y,z],[x',y',z'])) ->
+      let xs = xPatchBorders zseg dip
+          (dv', slices') = searchGoodSlice xs
+      in SegmentSearch xs dv' slices' $ zipAdjacent' xs $ \xseg ->
+          let ys = yPatchBorders zseg xseg dip
+              (dv'', slices'') = searchGoodSlice ys
+          in SegmentSearch ys dv'' slices'' $ zipAdjacent' ys $ \yseg ->
+              map fst $ filter (\(i, ([x,y,z], [x',y',z'])) ->
                    zseg `isInsideOf` (z, z')
                 && yseg `isInsideOf` (y, y')
                 && xseg `isInsideOf` (x, x')
@@ -142,8 +142,8 @@ dipoleSearch :: FastDipole -> (Double, Double, Double) -> [Int]
 dipoleSearch zDip (x,y,z) =
   let zix = quickSearch zDip z
       xDip = _fSegments zDip !! zix
-      xix = quickSearch xDip y
+      xix = quickSearch xDip x
       yDip = _fSegments xDip !! xix
-      yix = quickSearch yDip x
+      yix = quickSearch yDip y
       paramIx = _fSegments yDip !! yix
   in paramIx

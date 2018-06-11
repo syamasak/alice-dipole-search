@@ -1,0 +1,364 @@
+# Set of Chebyshev parameterizations for ALICE magnetic field
+START Sol30_Dip6_Uniform
+START SOLENOID
+#Number of pieces
+1
+
+# These are automatically generated data for the Chebyshev interpolation of 3D->3D function
+#
+START BSol_const
+# Dimensionality of the output
+3
+# Interpolation abs. precision
++9.99999997e-07
+# Lower boundaries of interpolation region
++0.00000000e+00
+-3.14159274e+00
+-7.00000000e+02
+# Upper boundaries of interpolation region
++5.60000000e+02
++3.14159274e+00
++7.00000000e+02
+# Parameterization for each output dimension follows:
+#
+START 
+# Number of rows
+0
+# Number of columns per row
+# Number of Coefs in each significant block of third dimension
+# Coefficients
+# Precision
++0.00000000e+00
+END 
+#
+START 
+# Number of rows
+0
+# Number of columns per row
+# Number of Coefs in each significant block of third dimension
+# Coefficients
+# Precision
++0.00000000e+00
+END 
+#
+START 
+# Number of rows
+1
+# Number of columns per row
+1
+# Number of Coefs in each significant block of third dimension
+1
+# Coefficients
+-5.00000000e+00
+# Precision
++0.00000000e+00
+END 
+#
+END BSol_const
+#
+#
+END SOLENOID
+START TPCINT
+#Number of pieces
+2
+
+# These are automatically generated data for the Chebyshev interpolation of 3D->3D function
+#
+START tpc0
+# Dimensionality of the output
+3
+# Interpolation abs. precision
++9.99999975e-05
+# Lower boundaries of interpolation region
++0.00000000e+00
+-3.14159274e+00
+-3.00000000e+02
+# Upper boundaries of interpolation region
++3.00000000e+02
++3.14159274e+00
++0.00000000e+00
+# Parameterization for each output dimension follows:
+#
+START 
+# Number of rows
+0
+# Number of columns per row
+# Number of Coefs in each significant block of third dimension
+# Coefficients
+# Precision
++0.00000000e+00
+END 
+#
+START 
+# Number of rows
+0
+# Number of columns per row
+# Number of Coefs in each significant block of third dimension
+# Coefficients
+# Precision
++0.00000000e+00
+END 
+#
+START 
+# Number of rows
+1
+# Number of columns per row
+5
+# Number of Coefs in each significant block of third dimension
+5
+0
+3
+0
+2
+# Coefficients
+-7.50000000e+02
++7.50000000e+02
++1.90734863e-05
++4.04357925e-05
+-2.40325935e-05
++9.91821344e-06
+-1.47375122e-05
++5.12970519e-06
+-9.91821344e-06
++1.47375122e-05
+# Precision
++0.00000000e+00
+END 
+#
+END tpc0
+#
+
+# These are automatically generated data for the Chebyshev interpolation of 3D->3D function
+#
+START tpc1
+# Dimensionality of the output
+3
+# Interpolation abs. precision
++9.99999975e-05
+# Lower boundaries of interpolation region
++0.00000000e+00
+-3.14159274e+00
++0.00000000e+00
+# Upper boundaries of interpolation region
++3.00000000e+02
++3.14159274e+00
++3.00000000e+02
+# Parameterization for each output dimension follows:
+#
+START 
+# Number of rows
+0
+# Number of columns per row
+# Number of Coefs in each significant block of third dimension
+# Coefficients
+# Precision
++0.00000000e+00
+END 
+#
+START 
+# Number of rows
+0
+# Number of columns per row
+# Number of Coefs in each significant block of third dimension
+# Coefficients
+# Precision
++0.00000000e+00
+END 
+#
+START 
+# Number of rows
+1
+# Number of columns per row
+5
+# Number of Coefs in each significant block of third dimension
+5
+0
+3
+0
+2
+# Coefficients
++7.50000000e+02
++7.50000000e+02
+-1.90734863e-05
++4.04357925e-05
++2.40325935e-05
+-9.91821344e-06
+-1.47375122e-05
+-5.12970519e-06
++9.91821344e-06
++1.47375122e-05
+# Precision
++0.00000000e+00
+END 
+#
+END tpc1
+#
+#
+END TPCINT
+START TPCRatINT
+#Number of pieces
+2
+
+# These are automatically generated data for the Chebyshev interpolation of 3D->3D function
+#
+START tpcr0
+# Dimensionality of the output
+3
+# Interpolation abs. precision
++1.99999995e-05
+# Lower boundaries of interpolation region
++0.00000000e+00
+-3.14159274e+00
+-3.00000000e+02
+# Upper boundaries of interpolation region
++3.00000000e+02
++3.14159274e+00
++0.00000000e+00
+# Parameterization for each output dimension follows:
+#
+START 
+# Number of rows
+0
+# Number of columns per row
+# Number of Coefs in each significant block of third dimension
+# Coefficients
+# Precision
++0.00000000e+00
+END 
+#
+START 
+# Number of rows
+0
+# Number of columns per row
+# Number of Coefs in each significant block of third dimension
+# Coefficients
+# Precision
++0.00000000e+00
+END 
+#
+START 
+# Number of rows
+0
+# Number of columns per row
+# Number of Coefs in each significant block of third dimension
+# Coefficients
+# Precision
++0.00000000e+00
+END 
+#
+END tpcr0
+#
+
+# These are automatically generated data for the Chebyshev interpolation of 3D->3D function
+#
+START tpcr1
+# Dimensionality of the output
+3
+# Interpolation abs. precision
++1.99999995e-05
+# Lower boundaries of interpolation region
++0.00000000e+00
+-3.14159274e+00
++0.00000000e+00
+# Upper boundaries of interpolation region
++3.00000000e+02
++3.14159274e+00
++3.00000000e+02
+# Parameterization for each output dimension follows:
+#
+START 
+# Number of rows
+0
+# Number of columns per row
+# Number of Coefs in each significant block of third dimension
+# Coefficients
+# Precision
++0.00000000e+00
+END 
+#
+START 
+# Number of rows
+0
+# Number of columns per row
+# Number of Coefs in each significant block of third dimension
+# Coefficients
+# Precision
++0.00000000e+00
+END 
+#
+START 
+# Number of rows
+0
+# Number of columns per row
+# Number of Coefs in each significant block of third dimension
+# Coefficients
+# Precision
++0.00000000e+00
+END 
+#
+END tpcr1
+#
+#
+END TPCRatINT
+START DIPOLE
+#Number of pieces
+1
+
+# These are automatically generated data for the Chebyshev interpolation of 3D->3D function
+#
+START BDip_const
+# Dimensionality of the output
+3
+# Interpolation abs. precision
++9.99999997e-07
+# Lower boundaries of interpolation region
+-4.00000000e+02
+-4.00000000e+02
+-1.44000000e+03
+# Upper boundaries of interpolation region
++4.00000000e+02
++4.00000000e+02
+-7.00000000e+02
+# Parameterization for each output dimension follows:
+#
+START 
+# Number of rows
+1
+# Number of columns per row
+1
+# Number of Coefs in each significant block of third dimension
+3
+# Coefficients
++1.57675004e+00
++4.92100048e+00
+-4.79149961e+00
+# Precision
++0.00000000e+00
+END 
+#
+START 
+# Number of rows
+0
+# Number of columns per row
+# Number of Coefs in each significant block of third dimension
+# Coefficients
+# Precision
++0.00000000e+00
+END 
+#
+START 
+# Number of rows
+0
+# Number of columns per row
+# Number of Coefs in each significant block of third dimension
+# Coefficients
+# Precision
++0.00000000e+00
+END 
+#
+END BDip_const
+#
+#
+END DIPOLE
+#
+END Sol30_Dip6_Uniform

@@ -8,6 +8,9 @@ DipoleParam.cabal
 *.pcm
 *.pdf
 *.json
-*.txt
 *k.cxx
+*k.h
 *_tmp.dat
+*.root
+untracked/
+

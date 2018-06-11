@@ -8,7 +8,8 @@
 
 int benchmarkPrec() {
   AliMagFast *m = new AliMagFast();
-  AliMagF   *m0 = new AliMagF("m0","m0");
+  //AliMagF   *m0 = new AliMagF("m0","m0");
+  AliMagF *m0 =new AliMagF("m", "m", 1, 1, AliMagF::k5kG, AliMagF::kBeamTypepp, -1, 1, 2, 15, "~/alice/mfchebKGI_sym.root");
   AliMagWrapCheb *mm = m0->GetMeasuredMap();
 
   std::default_random_engine g;
